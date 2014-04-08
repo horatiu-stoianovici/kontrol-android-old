@@ -26,10 +26,15 @@ import com.example.kontrol.carpeli.EditableAccomodatingLatinIMETypeNullIssues;
 import com.example.kontrol.carpeli.InputConnectionAccomodatingLatinIMETypeNullIssues;
 import com.example.kontrol.graphics.HBaseGraphics;
 import com.example.kontrol.graphics.HContext;
-import com.example.kontrol.graphics.KeyboardButtonSwitch;
-import com.example.kontrol.graphics.LeftClickGraphics;
-import com.example.kontrol.graphics.RightClickGraphics;
-import com.example.kontrol.graphics.TouchpadGraphics;
+import com.example.kontrol.graphics.mainscreen.KeyboardButtonSwitch;
+import com.example.kontrol.graphics.mainscreen.LeftClickGraphics;
+import com.example.kontrol.graphics.mainscreen.PresentationModeSwitch;
+import com.example.kontrol.graphics.mainscreen.RightClickGraphics;
+import com.example.kontrol.graphics.mainscreen.TouchpadGraphics;
+import com.example.kontrol.graphics.presentationscreen.NormalModeSwitch;
+import com.example.kontrol.graphics.presentationscreen.PresentationNext;
+import com.example.kontrol.graphics.presentationscreen.PresentationPrevious;
+import com.example.kontrol.graphics.presentationscreen.PresentationStartStop;
 import com.example.kontrol.tcpcommunications.HRequest;
 
 public class TouchpadView extends SurfaceView implements Runnable {
@@ -108,7 +113,7 @@ public class TouchpadView extends SurfaceView implements Runnable {
 				float myOffset = (float)offset;
 				switch(element.getContext())
 				{
-				case HContext.MusicScreen:
+				case HContext.Presentation:
 					myOffset -= canvasHeight;
 					break;
 				case HContext.TouchpadScreen:
@@ -123,28 +128,10 @@ public class TouchpadView extends SurfaceView implements Runnable {
 	
 	@Override
 	public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
-		//Passing FALSE as the SECOND ARGUMENT (fullEditor) to the constructor 
-		  // will result in the key events continuing to be passed in to this 
-		  // view.  Use our special BaseInputConnection-derived view
 		  InputConnectionAccomodatingLatinIMETypeNullIssues baseInputConnection = 
 		    new InputConnectionAccomodatingLatinIMETypeNullIssues(this, false);
-
-		   //In some cases an IME may be able to display an arbitrary label for a 
-		   // command the user can perform, which you can specify here.  A null value
-		   // here asks for the default for this key, which is usually something 
-		   // like Done.
 		   outAttrs.actionLabel = null;
-
-		   //Special content type for when no explicit type has been specified. 
-		   // This should be interpreted (by the IME that invoked 
-		   // onCreateInputConnection())to mean that the target InputConnection 
-		   // is not rich, it can not process and show things like candidate text 
-		   // nor retrieve the current text, so the input method will need to run 
-		   // in a limited "generate key events" mode.  This disables the more 
-		   // sophisticated kinds of editing that use a text buffer.
 		   outAttrs.inputType = InputType.TYPE_NULL;
-
-		   //This creates a Done key on the IME keyboard if you need one
 		   outAttrs.imeOptions = EditorInfo.IME_ACTION_DONE;
 
 		   return baseInputConnection;	
@@ -157,7 +144,7 @@ public class TouchpadView extends SurfaceView implements Runnable {
 			float myOffset = (float)offset;
 			switch(element.getContext())
 			{
-			case HContext.MusicScreen:
+			case HContext.Presentation:
 				myOffset -= canvasHeight;
 				break;
 			case HContext.TouchpadScreen:
@@ -182,6 +169,11 @@ public class TouchpadView extends SurfaceView implements Runnable {
 		graphicElements.add(new RightClickGraphics(context));
 		graphicElements.add(new KeyboardButtonSwitch(context, this));
 		graphicElements.add(new TouchpadGraphics(context));
+		graphicElements.add(new PresentationModeSwitch(context,  this));
+		graphicElements.add(new NormalModeSwitch(context, this));		
+		graphicElements.add(new PresentationStartStop(context));
+		graphicElements.add(new PresentationNext(context)); 
+		graphicElements.add(new PresentationPrevious(context));
 		
 		drawGraphicElements = new ArrayList<HBaseGraphics>(graphicElements);
 		eventGraphicElements = new ArrayList<HBaseGraphics>(graphicElements);
@@ -214,7 +206,7 @@ public class TouchpadView extends SurfaceView implements Runnable {
 			startTransition(0, transitionDuration);
 			break;
 
-		case HContext.MusicScreen:
+		case HContext.Presentation:
 			startTransition(canvasHeight + 1, transitionDuration);
 			break;
 		}
@@ -269,10 +261,8 @@ public class TouchpadView extends SurfaceView implements Runnable {
 					try {
 						req.SendTCP();
 					} catch (UnknownHostException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					return null;

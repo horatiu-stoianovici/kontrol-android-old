@@ -1,17 +1,18 @@
-package com.example.kontrol.graphics;
+package com.example.kontrol.graphics.mainscreen;
 
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.view.MotionEvent;
-import android.view.inputmethod.InputMethodManager;
 
 import com.example.kontrol.R;
+import com.example.kontrol.graphics.HBaseGraphics;
+import com.example.kontrol.graphics.HContext;
 import com.example.kontrol.views.TouchpadView;
 
 
-public class KeyboardButtonSwitch extends HBaseGraphics {
+public class PresentationModeSwitch extends HBaseGraphics {
 
 	private Drawable buttonDrawable, pressedDrawable;
 	private RectF position;
@@ -19,9 +20,9 @@ public class KeyboardButtonSwitch extends HBaseGraphics {
 	private int pressedId = -1;
 	private TouchpadView delegate;
 
-	public KeyboardButtonSwitch(Context context, TouchpadView view){
-		buttonDrawable = context.getResources().getDrawable(R.drawable.music_note_icon);
-		pressedDrawable = context.getResources().getDrawable(R.drawable.music_note_icon_pressed);
+	public PresentationModeSwitch(Context context, TouchpadView view){
+		buttonDrawable = context.getResources().getDrawable(R.drawable.presentation);
+		pressedDrawable = context.getResources().getDrawable(R.drawable.presentation_pressed);
 		delegate = view;
 		view.setFocusableInTouchMode(true);
 	}
@@ -53,8 +54,7 @@ public class KeyboardButtonSwitch extends HBaseGraphics {
 		case MotionEvent.ACTION_POINTER_UP:
 			if(activePointerId == pressedId){
 				pressedId = -1;
-				InputMethodManager imm =  (InputMethodManager) delegate.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-		        imm.showSoftInput(delegate, InputMethodManager.SHOW_FORCED);
+				delegate.switchToContext(HContext.Presentation);
 				return true;
 			}
 			break;
@@ -65,7 +65,7 @@ public class KeyboardButtonSwitch extends HBaseGraphics {
 	@Override
 	public void draw(Canvas canvas, float offset) {
 		if(position == null){
-			position = new RectF((canvas.getWidth() - size) / 2 , 0,(canvas.getWidth() + size) / 2 , size);
+			position = new RectF((canvas.getWidth() - 2*size) / 4 , 0,(canvas.getWidth() + 2*size) / 4 , size);
 		}
 		
 		RectF pos = rectWithOffset(position, offset);

@@ -1,4 +1,4 @@
-package com.example.kontrol.graphics;
+package com.example.kontrol.graphics.mainscreen;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -8,22 +8,28 @@ import android.os.AsyncTask;
 import android.view.MotionEvent;
 
 import com.example.kontrol.R;
+import com.example.kontrol.graphics.HBaseGraphics;
+import com.example.kontrol.graphics.HContext;
 import com.example.kontrol.tcpcommunications.HRequest;
 
-public class RightClickGraphics extends HBaseGraphics {
-	private RectF rightClickSize;
-	private Drawable rightClickButton, rightClickButton_pressed;
-	private boolean isRightClickPressed = false;
-	private int rightClickTriggeredById = -1;
-	
-	public RightClickGraphics(Context context){
-		rightClickButton = (Drawable)context.getResources().getDrawable(R.drawable.square_rightclick);
-		rightClickButton_pressed = (Drawable)context.getResources().getDrawable(R.drawable.square_rightclick_pressed);
+public class LeftClickGraphics extends HBaseGraphics {
+	private RectF leftClickSize;
+	private Drawable leftClickButton, leftClickButton_pressed;
+	private boolean isLeftClickPressed;
+	private int leftClickTriggeredById = -1;
+
+	public LeftClickGraphics(Context context){
+
+		leftClickButton = (Drawable) context.getResources().getDrawable(
+				R.drawable.square_leftclick);
+		leftClickButton_pressed = (Drawable) context.getResources()
+				.getDrawable(R.drawable.square_leftclick_pressed);
+
 	}
-	
+
 	@Override
 	public boolean onMotionEvent(MotionEvent event, float offset) {
-		if(rightClickSize == null){
+		if(leftClickSize == null){
 			return false;
 		}
 		// Get the pointer ID
@@ -38,10 +44,10 @@ public class RightClickGraphics extends HBaseGraphics {
 			y = event.getY(activePointerIndex);
 
 			// if the current touch is inside the left click button
-			if (rectWithOffset(rightClickSize, offset).contains((int) x, (int) y)) {
-				isRightClickPressed = true;
-				rightClickTriggeredById = activePointerId;
-				onRightClickDown();
+			if (rectWithOffset(leftClickSize, offset).contains(x, y)) {
+				isLeftClickPressed = true;
+				leftClickTriggeredById = activePointerId;
+				onLeftClickDown();
 				return true;
 			}
 
@@ -49,10 +55,10 @@ public class RightClickGraphics extends HBaseGraphics {
 		case MotionEvent.ACTION_UP:
 		case MotionEvent.ACTION_POINTER_UP:
 			// if it's the touch that triggered the left/right click
-			if (activePointerId == rightClickTriggeredById) {
-				isRightClickPressed = false;
-				rightClickTriggeredById = -1;
-				onRightClickUp();
+			if (activePointerId == leftClickTriggeredById) {
+				isLeftClickPressed = false;
+				leftClickTriggeredById = -1;
+				onLeftClickUp();
 				return true;
 			}
 			break;
@@ -62,30 +68,29 @@ public class RightClickGraphics extends HBaseGraphics {
 
 	@Override
 	public void draw(Canvas canvas, float offset) {
-		if (rightClickSize == null) {
-			rightClickSize = new RectF(canvas.getWidth() / 2,
-					5 * canvas.getHeight() / 6, canvas.getWidth(),
-					canvas.getHeight());
+		if (leftClickSize == null) {
+			leftClickSize = new RectF(0, 5 * canvas.getHeight() / 6,
+					canvas.getWidth() / 2, canvas.getHeight());
 		}
 
-		
-		if (isRightClickPressed) {
-			drawButton(canvas, rightClickButton_pressed, rectWithOffset(rightClickSize, offset));
+		if (isLeftClickPressed) {
+			drawButton(canvas, leftClickButton_pressed, rectWithOffset(leftClickSize, offset));
 		} else {
-			drawButton(canvas, rightClickButton, rectWithOffset(rightClickSize, offset));
+			drawButton(canvas, leftClickButton, rectWithOffset(leftClickSize, offset));
 		}
 	}
-	
+
+
 	/**
-	 * Right click start
+	 * Left click start
 	 */
-	private void onRightClickDown() {
+	private void onLeftClickDown() {
 		new AsyncTask<Void, Void, Void>() {
 
 			@Override
 			protected Void doInBackground(Void... params) {
 				HRequest request = new HRequest("mouse-click");
-				request.addParameter("2");
+				request.addParameter("0");
 				try {
 					request.SendTCP();
 				} catch (Exception e) {
@@ -98,15 +103,15 @@ public class RightClickGraphics extends HBaseGraphics {
 	}
 
 	/**
-	 * Right click end
+	 * Left click end
 	 */
-	private void onRightClickUp() {
+	private void onLeftClickUp() {
 		new AsyncTask<Void, Void, Void>() {
 
 			@Override
 			protected Void doInBackground(Void... params) {
 				HRequest request = new HRequest("mouse-click");
-				request.addParameter("3");
+				request.addParameter("1");
 				try {
 					request.SendTCP();
 				} catch (Exception e) {
@@ -117,7 +122,7 @@ public class RightClickGraphics extends HBaseGraphics {
 
 		}.execute();
 	}
-	
+
 	@Override
 	public int getContext() {
 		return HContext.TouchpadScreen;

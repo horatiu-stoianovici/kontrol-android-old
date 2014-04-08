@@ -1,4 +1,4 @@
-package com.example.kontrol.graphics;
+package com.example.kontrol.graphics.mainscreen;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -13,6 +13,8 @@ import android.view.MotionEvent;
 import android.view.VelocityTracker;
 
 import com.example.kontrol.R;
+import com.example.kontrol.graphics.HBaseGraphics;
+import com.example.kontrol.graphics.HContext;
 import com.example.kontrol.tcpcommunications.HRequest;
 import com.example.kontrol.views.TouchPoint;
 
